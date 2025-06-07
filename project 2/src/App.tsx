@@ -72,15 +72,20 @@ function App() {
       });
       
       if (response.ok) {
-        const previewData = await response.json();
-        setUploadedFiles(prev => ({
-          ...prev,
-          [fileType]: {
-            ...prev[fileType],
-            preview: previewData.data,
-            headers: previewData.headers
-          }
-        }));
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const previewData = await response.json();
+          setUploadedFiles(prev => ({
+            ...prev,
+            [fileType]: {
+              ...prev[fileType],
+              preview: previewData.data,
+              headers: previewData.headers
+            }
+          }));
+        } else {
+          console.error('プレビューレスポンスがJSONではありません');
+        }
       }
     } catch (error) {
       console.error('プレビューエラー:', error);
@@ -126,6 +131,17 @@ function App() {
       clearInterval(progressInterval);
       setProcessingProgress(100);
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('非JSONレスポンス:', text);
+        throw new Error('サーバーから無効なレスポンスが返されました');
+      }
+
       const result = await response.json();
       
       if (result.success) {
@@ -134,6 +150,7 @@ function App() {
         setErrors([result.error, ...(result.errors || [])]);
       }
     } catch (error) {
+      console.error('処理エラー:', error);
       setErrors([`処理に失敗しました: ${error.message}`]);
     } finally {
       setIsProcessing(false);
