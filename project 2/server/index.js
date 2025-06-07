@@ -158,6 +158,15 @@ function parseCSV(filePath, limit = null) {
   });
 }
 
+// ▼ ここから追記
+app.get('/api/download', (req, res) => {
+  const csvContent = '名前,年齢\n田中,30\n鈴木,25';
+
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename*=UTF-8\'\'sample.csv');
+  res.send('\uFEFF' + csvContent); // UTF-8 BOM付き
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
