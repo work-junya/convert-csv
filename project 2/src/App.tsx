@@ -5,6 +5,7 @@ import { ResultsDisplay } from './components/ResultsDisplay';
 import { Header } from './components/Header';
 import { Instructions } from './components/Instructions';
 import { FileX, AlertCircle } from 'lucide-react';
+import { API_BASE_URL } from './config/api';
 
 interface UploadedFile {
   file: File;
@@ -65,7 +66,7 @@ function App() {
       const formData = new FormData();
       formData.append('file', file);
       
-      const response = await fetch('http://localhost:3001/api/preview', {
+      const response = await fetch(`${API_BASE_URL}/api/preview`, {
         method: 'POST',
         body: formData
       });
@@ -117,7 +118,7 @@ function App() {
         setProcessingProgress(prev => Math.min(prev + 10, 90));
       }, 200);
 
-      const response = await fetch('http://localhost:3001/api/upload', {
+      const response = await fetch(`${API_BASE_URL}/api/upload`, {
         method: 'POST',
         body: formData
       });
