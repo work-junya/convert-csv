@@ -8,6 +8,11 @@ export function Instructions() {
   const downloadTemplate = async (type: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/templates/${type}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -28,6 +33,7 @@ export function Instructions() {
       document.body.removeChild(a);
     } catch (error) {
       console.error('ダウンロードに失敗しました:', error);
+      alert(`ダウンロードに失敗しました: ${error.message}`);
     }
   };
 
