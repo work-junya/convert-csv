@@ -1,17 +1,27 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronRight, Download, Info } from 'lucide-react';
+import { API_BASE_URL } from '../config/api';
 
 export function Instructions() {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const downloadTemplate = async (type: string) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/templates/${type}`);
+      const response = await fetch(`${API_BASE_URL}/api/templates/${type}`);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${type}.csv`;
+      
+      // 日本語ファイル名のマッピング
+      const fileNames = {
+        orders: '注文データ.csv',
+        customers: '顧客マスタ.csv',
+        shipping: '配送設定.csv',
+        products: '商品マスタ.csv'
+      };
+      
+      a.download = fileNames[type] || `${type}.csv`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
